@@ -18,6 +18,9 @@ class PacketSniff:
     conn = None
     stopped = False
 
+    def __init__(self, text):
+        self.text = text
+
     def start(self):
         self.conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW,
                              socket.ntohs(ETH_P_ALL))
@@ -25,27 +28,27 @@ class PacketSniff:
         while (not stopped):
             raw_data, addr = self.conn.recvfrom(65536)
             dest_mac, src_mac, eth_proto, data = self.ethernet_frame(raw_data)
-            print('\nEthernet Frame:')
-            print(
+            self.text.insert('insert', '\nEthernet Frame:')
+            self.text.insert('insert',
                 TAB_1 + 'Destination: {}, Source: {}, Protocol: {}'.format(dest_mac, src_mac, eth_proto))
 
             # 8 for IPv4
             if eth_proto == 8:
                 (version, header_length, ttl, proto,
                  src, target, data) = self.ipv4_packet(data)
-                print(TAB_1 + 'IPv4 Packet:')
-                print(
+                self.text.insert('insert',TAB_1 + 'IPv4 Packet:')
+                self.text.insert('insert',
                     TAB_2 + 'Version: {}, Header Length: {}, TTL: {}'.format(version, header_length, ttl))
-                print(
+                self.text.insert('insert',
                     TAB_2 + 'Protocol: {}, Source: {}, Target: {}'.format(proto, src, target))
                 # ICMP
                 if proto == 1:
                     icmp_type, code, checksum, data = self.icmp_packet(data)
-                    print(TAB_1 + 'ICMP Packet:')
-                    print(
+                    self.text.insert('insert',TAB_1 + 'ICMP Packet:')
+                    self.text.insert('insert',
                         TAB_2 + 'Type: {}, Code: {}, Checksum: {},'.format(icmp_type, code, checksum))
-                    print(TAB_2 + 'Data:')
-                    print(self.format_multi_line(DATA_TAB_3, data))
+                    self.text.insert('insert',TAB_2 + 'Data:')
+                    self.text.insert('insert',self.format_multi_line(DATA_TAB_3, data))
 
                 # TCP
                 # Video 7
@@ -53,33 +56,33 @@ class PacketSniff:
                     # not sure, data ot data[offset] in next line
                     (src_port, dest_port, sequence, acknowledge, flag_urg, flag_ack,
                      flag_psh, flag_rst, flag_syn, flag_fin, data) = self.tcp_segment(data)
-                    print(TAB_1 + 'TCP Segment:')
-                    print(
+                    self.text.insert('insert',TAB_1 + 'TCP Segment:')
+                    self.text.insert('insert',
                         TAB_2 + 'Source Port: {}, Destination Port: {}'.format(src_port, dest_port))
-                    print(
+                    self.text.insert('insert',
                         TAB_2 + 'Sequence: {}, Acknowledge: {}'.format(sequence, acknowledge))
-                    print(TAB_2 + 'Flags')
+                    self.text.insert('insert',TAB_2 + 'Flags')
                     # not sure next line
-                    print(TAB_3 + 'URG: {}, ACK: {}, PSH: {}, RST: {}, SYN: {}, FIN: {}'.format(
+                    self.text.insert('insert',TAB_3 + 'URG: {}, ACK: {}, PSH: {}, RST: {}, SYN: {}, FIN: {}'.format(
                         flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin))
-                    print(TAB_2 + 'Data')
-                    print(self.format_multi_line(DATA_TAB_3, data))
+                    self.text.insert('insert',TAB_2 + 'Data')
+                    self.text.insert('insert',self.format_multi_line(DATA_TAB_3, data))
 
                 # UDP
                 elif proto == 17:
                     src_port, dest_port, length, data = self.udp_segment(data)
-                    print(TAB_1 + 'UDP Segment:')
+                    self.text.insert('insert',TAB_1 + 'UDP Segment:')
                     # not sure last length in next line
-                    print(TAB_2 + 'Source Port: {}, Destination Port: {}, length: {}'.format(
+                    self.text.insert('insert',TAB_2 + 'Source Port: {}, Destination Port: {}, length: {}'.format(
                         src_port, dest_port, length))
 
                 # other
                 else:
-                    print(TAB_1 + 'Data:')
-                    print(self.format_multi_line(DATA_TAB_2, data))
+                    self.text.insert('insert',TAB_1 + 'Data:')
+                    self.text.insert('insert',self.format_multi_line(DATA_TAB_2, data))
             else:
-                print('Data:')
-                print(self.format_multi_line(DATA_TAB_1, data))
+                self.text.insert('insert','Data:')
+                self.text.insert('insert',self.format_multi_line(DATA_TAB_1, data))
     
     def stop(self):
         self.stopped = True

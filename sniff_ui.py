@@ -8,7 +8,6 @@ import _thread
 
 
 class Window(Frame):
-    ps = PacketSniff()
 
     # Define settings upon initialization. Here you can specify
     def __init__(self, master=None):
@@ -18,6 +17,7 @@ class Window(Frame):
 
         # reference to the master widget, which is the tk window
         self.master = master
+        self.ps = None
 
         # with that, we want to then run init_window, which doesn't yet exist
         self.init_window()
@@ -36,9 +36,13 @@ class Window(Frame):
                              command=self.start_btn_handler)
         stopButton = Button(self, text="Stop", command=self.stop_btn_handler)
 
+        text = Text(self, height=30, width=100)
+        self.ps = PacketSniff(text)
+
         # placing the button on my window
         startButton.place(x=0, y=0)
         stopButton.place(x=100, y=0)
+        text.place(x=0, y=50)
 
     def start_btn_handler(self):
         _thread.start_new_thread(self.thread_handler, ())
@@ -55,7 +59,7 @@ class Window(Frame):
 # you can later have windows within windows.
 root = Tk()
 
-root.geometry("400x300")
+root.geometry("700x500")
 
 # creation of an instance
 app = Window(root)

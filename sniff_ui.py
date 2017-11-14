@@ -35,14 +35,27 @@ class Window(Frame):
         startButton = Button(self, text="Start",
                              command=self.start_btn_handler)
         stopButton = Button(self, text="Stop", command=self.stop_btn_handler)
+      
+        # add a frame and put a text area into it
+        textPad = Frame(self)
+        self.text = Text(textPad, height=30, width=100)
 
-        text = Text(self, height=30, width=100)
-        self.ps = PacketSniff(text)
+        # add a vertical scroll bar to the text area
+        scroll = Scrollbar(textPad)
+        self.text.configure(yscrollcommand=scroll.set)
+
+        # pack everything
+        self.text.pack(side=LEFT)
+        scroll.pack(side=RIGHT, fill=Y)
+
+        scroll.config(command=self.text.yview)
+
+        self.ps = PacketSniff(self.text)
 
         # placing the button on my window
         startButton.place(x=0, y=0)
         stopButton.place(x=100, y=0)
-        text.place(x=0, y=50)
+        textPad.place(x=0, y=50)
 
     def start_btn_handler(self):
         _thread.start_new_thread(self.thread_handler, ())
@@ -59,7 +72,7 @@ class Window(Frame):
 # you can later have windows within windows.
 root = Tk()
 
-root.geometry("700x500")
+root.geometry("750x500")
 
 # creation of an instance
 app = Window(root)

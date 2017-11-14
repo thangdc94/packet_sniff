@@ -28,27 +28,27 @@ class PacketSniff:
         while (not stopped):
             raw_data, addr = self.conn.recvfrom(65536)
             dest_mac, src_mac, eth_proto, data = self.ethernet_frame(raw_data)
-            self.text.insert('insert', '\nEthernet Frame:')
+            self.text.insert('insert', '\nEthernet Frame:\n')
             self.text.insert('insert',
-                TAB_1 + 'Destination: {}, Source: {}, Protocol: {}'.format(dest_mac, src_mac, eth_proto))
+                TAB_1 + 'Destination: {}, Source: {}, Protocol: {}\n'.format(dest_mac, src_mac, eth_proto))
 
             # 8 for IPv4
             if eth_proto == 8:
                 (version, header_length, ttl, proto,
                  src, target, data) = self.ipv4_packet(data)
-                self.text.insert('insert',TAB_1 + 'IPv4 Packet:')
+                self.text.insert('insert',TAB_1 + 'IPv4 Packet:\n')
                 self.text.insert('insert',
-                    TAB_2 + 'Version: {}, Header Length: {}, TTL: {}'.format(version, header_length, ttl))
+                    TAB_2 + 'Version: {}, Header Length: {}, TTL: {}\n'.format(version, header_length, ttl))
                 self.text.insert('insert',
-                    TAB_2 + 'Protocol: {}, Source: {}, Target: {}'.format(proto, src, target))
+                    TAB_2 + 'Protocol: {}, Source: {}, Target: {}\n'.format(proto, src, target))
                 # ICMP
                 if proto == 1:
                     icmp_type, code, checksum, data = self.icmp_packet(data)
-                    self.text.insert('insert',TAB_1 + 'ICMP Packet:')
+                    self.text.insert('insert',TAB_1 + 'ICMP Packet:\n')
                     self.text.insert('insert',
-                        TAB_2 + 'Type: {}, Code: {}, Checksum: {},'.format(icmp_type, code, checksum))
-                    self.text.insert('insert',TAB_2 + 'Data:')
-                    self.text.insert('insert',self.format_multi_line(DATA_TAB_3, data))
+                        TAB_2 + 'Type: {}, Code: {}, Checksum: {},\n'.format(icmp_type, code, checksum))
+                    self.text.insert('insert',TAB_2 + 'Data:\n')
+                    self.text.insert('insert',self.format_multi_line(DATA_TAB_3, data) + '\n')
 
                 # TCP
                 # Video 7
@@ -56,33 +56,33 @@ class PacketSniff:
                     # not sure, data ot data[offset] in next line
                     (src_port, dest_port, sequence, acknowledge, flag_urg, flag_ack,
                      flag_psh, flag_rst, flag_syn, flag_fin, data) = self.tcp_segment(data)
-                    self.text.insert('insert',TAB_1 + 'TCP Segment:')
+                    self.text.insert('insert',TAB_1 + 'TCP Segment:\n')
                     self.text.insert('insert',
-                        TAB_2 + 'Source Port: {}, Destination Port: {}'.format(src_port, dest_port))
+                        TAB_2 + 'Source Port: {}, Destination Port: {}\n'.format(src_port, dest_port))
                     self.text.insert('insert',
-                        TAB_2 + 'Sequence: {}, Acknowledge: {}'.format(sequence, acknowledge))
+                        TAB_2 + 'Sequence: {}, Acknowledge: {}\n'.format(sequence, acknowledge))
                     self.text.insert('insert',TAB_2 + 'Flags')
                     # not sure next line
-                    self.text.insert('insert',TAB_3 + 'URG: {}, ACK: {}, PSH: {}, RST: {}, SYN: {}, FIN: {}'.format(
+                    self.text.insert('insert',TAB_3 + 'URG: {}, ACK: {}, PSH: {}, RST: {}, SYN: {}, FIN: {}\n'.format(
                         flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin))
-                    self.text.insert('insert',TAB_2 + 'Data')
-                    self.text.insert('insert',self.format_multi_line(DATA_TAB_3, data))
+                    self.text.insert('insert',TAB_2 + 'Data\n')
+                    self.text.insert('insert',self.format_multi_line(DATA_TAB_3, data) + '\n')
 
                 # UDP
                 elif proto == 17:
                     src_port, dest_port, length, data = self.udp_segment(data)
-                    self.text.insert('insert',TAB_1 + 'UDP Segment:')
+                    self.text.insert('insert',TAB_1 + 'UDP Segment:\n')
                     # not sure last length in next line
-                    self.text.insert('insert',TAB_2 + 'Source Port: {}, Destination Port: {}, length: {}'.format(
+                    self.text.insert('insert',TAB_2 + 'Source Port: {}, Destination Port: {}, length: {}\n'.format(
                         src_port, dest_port, length))
 
                 # other
                 else:
-                    self.text.insert('insert',TAB_1 + 'Data:')
-                    self.text.insert('insert',self.format_multi_line(DATA_TAB_2, data))
+                    self.text.insert('insert',TAB_1 + 'Data:\n')
+                    self.text.insert('insert',self.format_multi_line(DATA_TAB_2, data) + '\n')
             else:
                 self.text.insert('insert','Data:')
-                self.text.insert('insert',self.format_multi_line(DATA_TAB_1, data))
+                self.text.insert('insert',self.format_multi_line(DATA_TAB_1, data) + '\n')
     
     def stop(self):
         self.stopped = True
